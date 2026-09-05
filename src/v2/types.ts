@@ -2,8 +2,15 @@ import type { PaymentMethodCode } from '../constants/payment-methods.js';
 
 export interface ItemDetail {
   name: string;
+  /** Display quantity. Duitku does **not** multiply `price` by this. */
   quantity: number;
-  /** Per-item price, integer IDR. The sum across items must equal `paymentAmount` exactly. */
+  /**
+   * Line total in integer IDR — already multiplied by `quantity`, not the unit price.
+   *
+   * Duitku sums the raw `price` fields and requires the total to equal
+   * `paymentAmount` exactly, otherwise the inquiry returns HTTP 409.
+   * Verified against the sandbox API; the example in Duitku's own docs is wrong.
+   */
   price: number;
 }
 

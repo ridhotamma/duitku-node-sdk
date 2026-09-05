@@ -93,9 +93,13 @@ export class PopClient {
       throw new DuitkuConfigError(`paymentAmount must be an integer of at least ${MIN_PAYMENT_AMOUNT} IDR`);
     }
     if (params.itemDetails?.length) {
-      const total = params.itemDetails.reduce((sum, i) => sum + i.price * (i.quantity ?? 1), 0);
+      // As with the v2 API, Duitku sums `price` and ignores `quantity`.
+      const total = params.itemDetails.reduce((sum, i) => sum + i.price, 0);
       if (total !== params.paymentAmount) {
-        throw new DuitkuConfigError(`itemDetails total (${total}) must equal paymentAmount (${params.paymentAmount})`);
+        throw new DuitkuConfigError(
+          `itemDetails price total (${total}) must equal paymentAmount (${params.paymentAmount}). ` +
+            'Each `price` must be the line total — Duitku ignores `quantity`.',
+        );
       }
     }
     return (await request(

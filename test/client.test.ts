@@ -73,7 +73,7 @@ test('createPayment normalizes Duitku\'s AppUrl casing', async () => {
   assert.equal(result.appUrl, 'https://tokopedia.app.link/x');
 });
 
-test('createPayment rejects itemDetails that do not sum to paymentAmount', async () => {
+test('createPayment rejects itemDetails whose price total does not match paymentAmount', async () => {
   const client = new V2Client(CREDS);
   await assert.rejects(
     () =>
@@ -92,7 +92,9 @@ test('createPayment rejects itemDetails that do not sum to paymentAmount', async
   );
 });
 
-test('createPayment accepts itemDetails whose quantity-weighted total matches', async () => {
+// Verified against the sandbox API: Duitku sums the raw `price` fields and ignores
+// `quantity`, so `price` is the line total. Duitku's own docs example is wrong.
+test('createPayment accepts itemDetails whose raw price total matches, regardless of quantity', async () => {
   const { fetch } = stubFetch({ statusCode: '00', statusMessage: 'SUCCESS', reference: 'r' });
   const client = new V2Client({ ...CREDS, fetch });
   const result = await client.createPayment({
@@ -106,10 +108,34 @@ test('createPayment accepts itemDetails whose quantity-weighted total matches', 
     returnUrl: 'https://example.com/r',
     itemDetails: [
       { name: 'Test Item 1', price: 10000, quantity: 1 },
-      { name: 'Test Item 2', price: 10000, quantity: 3 },
+      // quantity 3 but price is the line total — sums to 40000, which Duitku accepts.
+      { name: 'Test Item 2', price: 30000, quantity: 3 },
     ],
   });
   assert.equal(result.reference, 'r');
+});
+
+test('createPayment rejects the quantity-multiplied reading that Duitku docs imply', async () => {
+  const client = new V2Client(CREDS);
+  await assert.rejects(
+    () =>
+      client.createPayment({
+        paymentAmount: 40000,
+        merchantOrderId: 'o1',
+        paymentMethod: 'BC',
+        productDetails: 'x',
+        email: 'a@b.com',
+        customerVaName: 'John Doe',
+        callbackUrl: 'https://example.com/c',
+        returnUrl: 'https://example.com/r',
+        // price*quantity is 40000, but sum(price) is 20000 — the sandbox returns HTTP 409.
+        itemDetails: [
+          { name: 'Test Item 1', price: 10000, quantity: 1 },
+          { name: 'Test Item 2', price: 10000, quantity: 3 },
+        ],
+      }),
+    /price total \(20000\)/,
+  );
 });
 
 test('createPayment rejects amounts below the 10,000 IDR floor', async () => {

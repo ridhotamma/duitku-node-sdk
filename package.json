@@ -1,7 +1,7 @@
 {
   "name": "duitku-node-sdk",
-  "version": "0.1.1",
-  "description": "Unofficial Node/Bun SDK for Duitku \u2014 v2 Payment API, Duitku Pop, SNAP API and Disbursement. Zero dependencies, TypeScript-first.",
+  "version": "0.1.2",
+  "description": "Unofficial Node/Bun SDK for Duitku — v2 Payment API, Duitku Pop, SNAP API and Disbursement. Zero dependencies, TypeScript-first.",
   "keywords": [
     "duitku",
     "payment-gateway",

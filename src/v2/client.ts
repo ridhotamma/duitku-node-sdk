@@ -212,10 +212,14 @@ export class V2Client {
       throw new DuitkuConfigError('customerVaName must be at most 20 characters');
     }
     if (p.itemDetails?.length) {
-      const total = p.itemDetails.reduce((sum, i) => sum + i.price * (i.quantity ?? 1), 0);
+      // Duitku sums the raw `price` fields and ignores `quantity`, so each
+      // `price` must already be that line's total.
+      const total = p.itemDetails.reduce((sum, i) => sum + i.price, 0);
       if (total !== p.paymentAmount) {
         throw new DuitkuConfigError(
-          `itemDetails total (${total}) must equal paymentAmount (${p.paymentAmount}) — Duitku returns HTTP 409 otherwise`,
+          `itemDetails price total (${total}) must equal paymentAmount (${p.paymentAmount}). ` +
+            'Duitku sums `price` and ignores `quantity`, so each `price` must be the line total ' +
+            '(unit price x quantity). Otherwise the inquiry returns HTTP 409.',
         );
       }
     }

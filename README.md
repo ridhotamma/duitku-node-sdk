@@ -258,9 +258,41 @@ Caught client-side, before the request goes out:
 
 - `paymentAmount` must be an integer of at least 10,000 IDR
 - `merchantOrderId` at most 50 chars; `customerVaName` at most 20
-- `itemDetails` must sum (price × quantity) to `paymentAmount` exactly — otherwise Duitku returns HTTP 409
+- `itemDetails` — the sum of the raw `price` fields must equal `paymentAmount` exactly (see below)
 - Paylater channels (`DN`, `AT`) require `customerDetail` and `itemDetails`
 - Pop's timestamp is computed once and reused in both the signature and the header
+
+## `itemDetails`: `price` is the line total
+
+Duitku sums the raw `price` fields and **ignores `quantity`**. So `price` must already be
+the total for that line, not the unit price:
+
+```ts
+itemDetails: [
+  { name: 'Item 1', price: 10_000, quantity: 1 },  // line total 10,000
+  { name: 'Item 2', price: 30_000, quantity: 3 },  // line total 30,000 (unit price 10,000)
+]
+// sum(price) = 40,000 → must equal paymentAmount
+```
+
+The example in Duitku's own docs (`10000 x1 + 10000 x3` against a `paymentAmount` of
+40,000) does **not** work — the sandbox rejects it with
+`409 Payment amount must be equal to all item price`. This SDK validates the rule that the
+live API actually enforces, verified against the sandbox, and fails locally before spending
+a round trip.
+
+## Sandbox behaviour worth knowing
+
+Observed against a live sandbox project, where it differs from the published docs:
+
+- **A bad signature returns HTTP 403**, not the documented 401. Both surface as
+  `DuitkuApiError`; branch on `err.status` only if you must.
+- **A reused `merchantOrderId` is not reliably rejected.** The docs promise 409, but the
+  sandbox accepted a resubmit — returning the *same* `reference` with a *different*
+  `vaNumber`. Treat uniqueness as your responsibility: generate a fresh
+  `merchantOrderId` per attempt, or you risk a customer paying a stale VA number.
+- **`getPaymentMethods` is the source of truth for channels.** A fresh project may list
+  channels the docs call retired (e.g. `LQ` LinkAja QRIS), and omit ones you expected.
 
 ## Constants
 
