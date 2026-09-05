@@ -1,11 +1,32 @@
 {
   "name": "duitku-node-sdk",
   "version": "0.1.0",
-  "description": "Unofficial Node/Bun SDK for Duitku — v2 Payment API, Duitku Pop, SNAP API and Disbursement. Zero dependencies, TypeScript-first.",
-  "keywords": ["duitku", "payment-gateway", "indonesia", "qris", "virtual-account", "snap", "disbursement"],
+  "description": "Unofficial Node/Bun SDK for Duitku \u2014 v2 Payment API, Duitku Pop, SNAP API and Disbursement. Zero dependencies, TypeScript-first.",
+  "keywords": [
+    "duitku",
+    "payment-gateway",
+    "indonesia",
+    "qris",
+    "virtual-account",
+    "snap",
+    "disbursement"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOUR_ORG/duitku-node-sdk.git"
+  },
+  "homepage": "https://github.com/YOUR_ORG/duitku-node-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/YOUR_ORG/duitku-node-sdk/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,7 +38,11 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",

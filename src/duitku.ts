@@ -102,7 +102,7 @@ export class Duitku {
    * `DUITKU_DISBURSEMENT_SECRET_KEY`, `DUITKU_SNAP_PRIVATE_KEY`,
    * `DUITKU_SNAP_PUBLIC_KEY`.
    */
-  static fromEnv(env: NodeJS.ProcessEnv = process.env): Duitku {
+  static fromEnv(env: Record<string, string | undefined> = process.env): Duitku {
     const merchantCode = env['DUITKU_MERCHANT_CODE'];
     const apiKey = env['DUITKU_API_KEY'];
     if (!merchantCode || !apiKey) {
