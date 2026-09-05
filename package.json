@@ -1,0 +1,34 @@
+{
+  "name": "duitku-node-sdk",
+  "version": "0.1.0",
+  "description": "Unofficial Node/Bun SDK for Duitku — v2 Payment API, Duitku Pop, SNAP API and Disbursement. Zero dependencies, TypeScript-first.",
+  "keywords": ["duitku", "payment-gateway", "indonesia", "qris", "virtual-account", "snap", "disbursement"],
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
